@@ -1,0 +1,15 @@
+<div>
+    <table>
+      <tr>
+        <th>Item</th>
+        <th>Category</th>
+      </tr>
+      <tr *ngFor="let item of items" draggable="true" (dragstart)="onDragStart($event, item)">
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+      </tr>
+    </table>
+  
+    <div id="venn-diagram-container"></div> <!-- Canvas will attach here -->
+  </div>
+  

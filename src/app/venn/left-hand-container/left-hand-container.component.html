@@ -1,0 +1,77 @@
+
+<table>
+    <thead>
+      <tr>
+        <!-- Dynamically generate table headers based on categories -->
+        <th *ngFor="let category of categories">
+          {{ category }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <!-- List items under each category -->
+        <td *ngFor="let category of categories">
+          <ul>
+            <ng-container *ngFor="let item of items">
+                <li draggable="true" (dragstart)="onDragStart($event, item)" *ngIf="item.category === category">
+                    
+                    <ng-container *ngIf="item.name.includes('Image'); else textContent">
+                        <img src="https://via.placeholder.com/50" alt="Image" />
+                      </ng-container>
+                      <ng-template #textContent>{{ item.name }}</ng-template>
+                  </li>
+            </ng-container>
+            
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div id="venn-diagram-container"></div> 
+<!-- <div>
+    <table>
+      <tr>
+        <th *ngFor="let category of categories">{{category}}</th>
+
+      </tr>
+      <tr *ngFor="let category of categories">
+        <ng-container *ngFor="let item of items">
+            <td  *ngIf="item?.category === category" draggable="true" (dragstart)="onDragStart($event, item)">{{ item.name }}</td>
+
+        </ng-container>
+        
+        
+      </tr>
+    </table> 
+  
+    <div id="venn-diagram-container"></div> 
+  
+  </div> -->
+  
+<!-- <div cdkDrag>drag me around</div>
+
+ <div >
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Column 1</th>
+          <th>Column 2</th>
+          <th>Column 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items">
+          <td draggable="true" (dragstart)="onDragStart($event, item)">{{ item.col1 }}</td>
+          <td  (dragstart)="onDragStart($event, item)">
+            <ng-container *ngIf="item.col2.includes('Image'); else textContent">
+              <img src="https://via.placeholder.com/50" alt="Image" />
+            </ng-container>
+            <ng-template #textContent>{{ item.col2 }}</ng-template>
+          </td>
+          <td draggable="true" (dragstart)="onDragStart($event, item)">{{ item.col3 }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div> -->
+  

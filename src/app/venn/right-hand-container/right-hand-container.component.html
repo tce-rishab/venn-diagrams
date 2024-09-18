@@ -1,0 +1,27 @@
+<!-- 
+<div cdkDrag>drag me around</div>
+
+<div >
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Column 1</th>
+          <th>Column 2</th>
+          <th>Column 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items" >
+          <td cdkDrag>{{ item.col1 }}</td>
+          <td cdkDrag>
+            <ng-container *ngIf="item.col2.includes('Image'); else textContent">
+              <img src="https://via.placeholder.com/50" alt="Image" />
+            </ng-container>
+            <ng-template #textContent>{{ item.col2 }}</ng-template>
+          </td>
+          <td cdkDrag>{{ item.col3 }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+   -->
