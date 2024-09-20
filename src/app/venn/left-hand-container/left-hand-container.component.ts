@@ -1,4 +1,4 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragStart, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, OnInit } from '@angular/core';
 import * as p5 from 'p5';
 
@@ -9,15 +9,28 @@ import * as p5 from 'p5';
 })
 export class LeftHandContainerComponent implements OnInit {
   private p5: any;
-  categories = ['A', 'B', 'C'];
-  items = [
-    { name: 'Item 1', category: 'A' },
-    { name: 'Item 2', category: 'B' },
-    { name: 'Item 3', category: 'C' },
-    { name: 'Item 4', category: 'A' },
-    { name: 'Item 5', category: 'B' },
-    { name: 'Item 6', category: 'C' },
+  // categories = ['A', 'B', 'C'];
+ 
+  // items:Array <{name: string, category: string}> = [
+  //   { name: 'Item 1', category: 'A' },
+  //   { name: 'Item 2', category: 'B' },
+  //   { name: 'Item 3', category: 'C' },
+  //   { name: 'Item 4', category: 'A' },
+  //   { name: 'Item 5', category: 'B' },
+  //   { name: 'Item 6', category: 'C' },
+  // ];
+
+  categories = ['Herbivore', 'Carnivore', 'Omnivore'];
+  items:Array <{name: string, category: string}> = [
+    { name: 'Cow', category: 'Herbivore' },
+    { name: 'Lion', category: 'Carnivore' },
+    { name: 'Dog', category: 'Omnivore' },
+    { name: 'Deer', category: 'Herbivore' },
+    { name: 'Puma', category: 'Carnivore' },
+    { name: 'Cat', category: 'Omnivore' },
   ];
+
+  dropIntoList:Array <{name: string, category: string}> = [];
 
 
 
@@ -26,6 +39,29 @@ export class LeftHandContainerComponent implements OnInit {
   //   { col1: 'Item 2 Text', col2: 'Item 2 Image', col3: 'Item 2 Text' },
   //   { col1: 'Item 3 Text', col2: 'Item 3 Image', col3: 'Item 3 Text' }
   // ];
+  todo = ['Get to work', 'Pick up groceries', 'Go home', 'Fall asleep'];
+
+  done = ['Get up', 'Brush teeth', 'Take a shower', 'Check e-mail', 'Walk dog'];
+
+  drop2(event: CdkDragDrop<Array<{ name: string, category: string }>>) {
+    if (this.validateDropPoint(event)) {
+      if (event.previousContainer === event.container) {
+        moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      } else {
+            const index = this.items?.findIndex(item => item?.name === this.draggedItem?.name);
+        transferArrayItem(
+          event.previousContainer.data,
+          event.container.data,
+          index,               //calculate the index of dragged item.
+          event.currentIndex,
+        );
+      }
+
+      this.draggedItem = null; // Clear the dragged item
+    }
+
+    console.log('drop2', event, this.items, this.dropIntoList)
+  }
   // items = [
   //   { col1: 'Item 1 Text', col2: 'Item 1 Text', col3: 'Item 1 Text' },
   //   { col1: 'Item 2 Text', col2: 'Item 2 Image', col3: 'Item 2 Text' },
@@ -40,9 +76,44 @@ export class LeftHandContainerComponent implements OnInit {
     this.createCanvas();
   }
 
-  onDragStart(event: DragEvent, item: any): void {
+  onDragStartCdk(event: CdkDragStart, item: any): void {
+    console.log('Drag start Event:', event);
     this.draggedItem = item;
-    event.dataTransfer?.setData('text', JSON.stringify(item));
+    // event.dataTransfer?.setData('text', JSON.stringify(item));
+  }
+
+  validateDropPoint(event: CdkDragDrop<Array<any>>): boolean {
+    console.log('Drop Event:', event,this.draggedItem);
+
+    let { x, y } = event?.dropPoint; // p5.js mouse coordinates
+    const item = this.draggedItem;
+
+     // Get the p5 canvas position
+  const canvasElement = this.p5.canvas; // Assuming you have the p5 canvas stored as this.p5.canvas
+  const canvasRect = canvasElement.getBoundingClientRect(); // Get the bounding rectangle of the canvas
+
+  // Adjust drop coordinates relative to the p5 canvas
+  x = x - canvasRect.left;
+  y = y - canvasRect.top;
+
+    if (item) {
+      const inCircleA = this.isInsideCircle(x, y, 150, 200, 100); // Circle A
+      const inCircleB = this.isInsideCircle(x, y, 250, 200, 100); // Circle B
+
+      if (item.category === this.categories[0] && inCircleA && !inCircleB ) {
+        alert(`Item ${item.name} dropped in correct area ${ this.categories[0]}!`);
+      } else if (item.category === this.categories[1] && inCircleB && !inCircleA) {
+        alert(`Item ${item.name} dropped in correct area ${ this.categories[1]}!`);
+      } else if (item.category === this.categories[2] && inCircleA && inCircleB) {
+        alert(`Item ${item.name} dropped in correct intersection area ${ this.categories[2]}!`);
+      } else {
+        alert(`Item ${item.name} dropped in wrong area.`);
+        return false;
+      }
+    }
+
+    
+    return true;
   }
 
   createCanvas(): void {
@@ -60,9 +131,9 @@ export class LeftHandContainerComponent implements OnInit {
       });
 
       // Bind 'drop' event to handle dropping
-      canvas.elt.addEventListener('drop', (event: DragEvent) => {
-        this.onDrop(event);
-      });
+      // canvas.elt.addEventListener('drop', (event: DragEvent) => {
+      //   this.onDrop(event);
+      // });
     };
 
     p.draw = () => {
