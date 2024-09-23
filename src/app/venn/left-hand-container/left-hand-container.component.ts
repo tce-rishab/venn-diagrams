@@ -182,6 +182,10 @@ export class LeftHandContainerComponent implements OnInit, AfterViewInit {
         console.log('click_transfer', this.items, this.dropIntoList)
         this.sourceClick = null;
     }
+
+     // call pop up if all items are moved
+     if(!this.items?.length)
+      this.openDialog();
   }
 
   validateDropPoint(event: CdkDragDrop<Array<any>>): boolean {
