@@ -28,7 +28,7 @@
   </div>
    -->
   
-  <div fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="30%" style="margin: right 10px ;">
+  <div fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="10%" style="margin: right 10px ;">
     
       <div id="venn-diagram-container" #doneList="cdkDropList" [cdkDropListData]="dropIntoList" cdkDropList [cdkDropListConnectedTo]="[todoList]"
         (cdkDropListDropped)="drop2($event)"></div>
@@ -36,35 +36,43 @@
     
     <div  cdkDropList #todoList="cdkDropList" [cdkDropListData]="items" [cdkDropListConnectedTo]="[doneList]"
       class="example-list" (cdkDropListDropped)="drop2($event)">
-      <table>
-        <thead>
-          <tr>
-            <!-- Dynamically generate table headers based on categories -->
-            <th *ngFor="let category of categories">
-              {{ category }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <!-- List items under each category (cdkDragEnded)="onDropCdk($event)"-->
-            <td *ngFor="let category of categories">
-              <ul>
-                <ng-container *ngFor="let item of items">
-                  <li cdkDrag (cdkDragStarted)="onDragStartCdk($event, item)" *ngIf="item.category === category">
-  
-                    <ng-container *ngIf="item.name.includes('images'); else textContent">
-                      <img style="height: 50px; width: 50px;" [src]="item?.name" alt="Image" />
-                    </ng-container>
-                    <ng-template #textContent>{{ item.name }}</ng-template>
-                  </li>
+     
+        <!-- Reset Button -->
+        <button (click)="resetGrid()">Reset</button>
+        
+        <!-- 3x3 Table -->
+        <table border="1">
+          <thead>
+            <tr>
+              <!-- Dynamically generate table headers based on categories -->
+              <th *ngFor="let category of categories; let i = index ">
+                {{ category }} <span *ngIf="i < 2 ">Or</span>
+                 
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Iterate over shuffled items and display them in a 3x3 grid -->
+            <tr *ngFor="let row of [0, 1, 2]">
+              <td *ngFor="let col of [0, 1, 2]">
+                <!-- Calculate the index based on row and column -->
+                <ng-container *ngIf="shuffledItems[row * 3 + col] as item">
+                  <ul>
+                    <li cdkDrag (cdkDragStarted)="onDragStartCdk($event, item)">
+                      <ng-container *ngIf="item.src.includes('images'); else textContent">
+                        <img style="height: 50px; width: 50px;" [src]="item?.src" alt="Image" />
+                        <label>{{ item?.name }}</label>
+                      </ng-container>
+                      <ng-template #textContent>{{ item?.name }}</ng-template>
+                    </li>
+                  </ul>
                 </ng-container>
-  
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      
   
     </div>
   

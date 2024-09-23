@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>Do you want to Play Again?</h2>
+<mat-dialog-content class="mat-typography">
+  <h3>Press Reset to play again</h3>
+  <p>It will reset the table of images in a random order.</p>
+
+  <h3>Press Cancel to Discard</h3>
+  
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>Reset</button>
+</mat-dialog-actions>

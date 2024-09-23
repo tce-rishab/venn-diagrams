@@ -6,6 +6,8 @@ import { DiagramContainerComponent } from './diagram-container/diagram-container
 import { VennRoutingModule } from './venn.routing.module';
 import { VennMaterialModule } from './venn-material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ResetDialogComponent } from './reset-dialog/reset-dialog.component';
+
 
 
 @NgModule({
@@ -13,6 +15,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     RightHandContainerComponent,
     LeftHandContainerComponent,
     DiagramContainerComponent,
+    ResetDialogComponent,
+    
     
   ],
   imports: [

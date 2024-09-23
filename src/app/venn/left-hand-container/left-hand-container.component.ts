@@ -1,7 +1,15 @@
 import { CdkDragDrop, CdkDragStart, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, ElementRef, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import * as p5 from 'p5';
+import { ResetDialogComponent } from '../reset-dialog/reset-dialog.component';
 
+
+export interface VennDiagramI {
+  name: string, 
+  category: string, 
+  src: string
+}
 @Component({
   selector: 'app-left-hand-container',
   templateUrl: './left-hand-container.component.html',
@@ -9,9 +17,12 @@ import * as p5 from 'p5';
 })
 export class LeftHandContainerComponent implements OnInit {
   private p5: any;
+
+  shuffledItems: any[] = [];
+  resetItems: Array<VennDiagramI> = [];
   // categories = ['A', 'B', 'C'];
  
-  // items:Array <{name: string, category: string}> = [
+  // items:Array <VennDiagramI> = [
   //   { name: 'Item 1', category: 'A' },
   //   { name: 'Item 2', category: 'B' },
   //   { name: 'Item 3', category: 'C' },
@@ -21,16 +32,19 @@ export class LeftHandContainerComponent implements OnInit {
   // ];
 
   categories = ['Herbivore', 'Carnivore', 'Omnivore'];
-  items:Array <{name: string, category: string}> = [
-    { name: 'Cow', category: 'Herbivore' },
-    { name: 'Lion', category: 'Carnivore' },
-    { name: 'Dog', category: 'Omnivore' },
-    { name: 'Deer', category: 'Herbivore' },
-    { name: 'Puma', category: 'Carnivore' },
-    { name: 'Cat', category: 'Omnivore' },
+  items:Array <VennDiagramI> = [
+    { name: 'Cow', category: 'Herbivore', src: '/assets/images/cow.svg' },
+    { name: 'Lion', category: 'Carnivore', src: '/assets/images/lion.svg' },
+    { name: 'Dog', category: 'Omnivore', src: '/assets/images/dog.svg' },
+    { name: 'Deer', category: 'Herbivore', src: '/assets/images/deer.svg' },
+    { name: 'Badger', category: 'Omnivore', src: '/assets/images/badger.svg' },
+    { name: 'Giraffe', category: 'Herbivore', src: '/assets/images/giraffe.svg' },
+    { name: 'Polar Bear', category: 'Carnivore', src: '/assets/images/polar-bear.svg' },
+    { name: 'dolphin', category: 'Carnivore', src: '/assets/images/dolphin.svg' },
+    { name: 'Rhinoceros', category: 'Herbivore', src: '/assets/images/rhinoceros.svg' },
   ];
 
-  dropIntoList:Array <{name: string, category: string}> = [];
+  dropIntoList:Array <VennDiagramI> = [];
 
 
 
@@ -39,11 +53,25 @@ export class LeftHandContainerComponent implements OnInit {
   //   { col1: 'Item 2 Text', col2: 'Item 2 Image', col3: 'Item 2 Text' },
   //   { col1: 'Item 3 Text', col2: 'Item 3 Image', col3: 'Item 3 Text' }
   // ];
-  todo = ['Get to work', 'Pick up groceries', 'Go home', 'Fall asleep'];
 
-  done = ['Get up', 'Brush teeth', 'Take a shower', 'Check e-mail', 'Walk dog'];
+  
+  shuffleArray(array: any[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
 
-  drop2(event: CdkDragDrop<Array<{ name: string, category: string }>>) {
+  // Method to reset and shuffle the grid items
+  resetGrid() {
+    if(this.items?.length)
+    this.shuffledItems = this.shuffleArray(this.items); // Shuffle a copy of the items array
+  else 
+  this.shuffledItems = this.shuffleArray(this.resetItems); 
+  }
+
+  drop2(event: CdkDragDrop<Array<VennDiagramI>>) {
     if (this.validateDropPoint(event)) {
       if (event.previousContainer === event.container) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
@@ -58,9 +86,24 @@ export class LeftHandContainerComponent implements OnInit {
       }
 
       this.draggedItem = null; // Clear the dragged item
+
+      // call pop up if all items are moved
+         if(!this.items?.length)
+           this.openDialog();
     }
 
+
     console.log('drop2', event, this.items, this.dropIntoList)
+  }
+
+  openDialog() {
+    const dialogRef = this.dialog.open(ResetDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result)
+        this.resetGrid()
+
+    });
   }
   // items = [
   //   { col1: 'Item 1 Text', col2: 'Item 1 Text', col3: 'Item 1 Text' },
@@ -70,10 +113,12 @@ export class LeftHandContainerComponent implements OnInit {
 
   draggedItem: any;
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef, public dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.createCanvas();
+    this.resetGrid();
+    this.resetItems = [...this.items]
   }
 
   onDragStartCdk(event: CdkDragStart, item: any): void {
@@ -148,10 +193,10 @@ export class LeftHandContainerComponent implements OnInit {
 
       // Add labels
       p.fill(0);
-      p.textSize(16);
-      p.text(this.categories[0], 100, 180);
-      p.text(this.categories[1], 300, 180);
-      p.text(this.categories[2], 180, 190);
+      p.textSize(11);
+      p.text(this.categories[0], 110, 120);
+      p.text(this.categories[1], 240, 120);
+      p.text(this.categories[2], 175, 150);
     };
   }
 

@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LeftHandDiagramComponent } from './left-hand-diagram/left-hand-diagram.component';
 import { VennModule } from './venn/venn.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
 
@@ -18,6 +19,7 @@ import { VennModule } from './venn/venn.module';
     AppRoutingModule,
     // DragDropModule
     VennModule,
+    BrowserAnimationsModule,
     // FlexLayoutModule
     
   ],

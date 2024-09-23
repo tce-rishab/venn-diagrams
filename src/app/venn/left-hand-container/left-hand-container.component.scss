@@ -1,18 +1,19 @@
 table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  th, td {
-    border: 1px solid black;
-    padding: 8px;
-    text-align: center;
-    vertical-align: top;
-  }
-  
-  ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
+  width: 300px;
+  border-collapse: collapse; /* Prevents gaps between borders if any */
+}
+
+th {
+  border: none; /* Removes the borders of table cells */
+  padding: 8px; /* Adds padding for better spacing */
+  text-align: left;
+}
+
+/* Optional: Remove bullet points from the list */
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
   
