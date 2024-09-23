@@ -29,19 +29,25 @@
    -->
   
   <div fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="10%" style="margin: right 10px ;">
-    
-      <div id="venn-diagram-container" #doneList="cdkDropList" [cdkDropListData]="dropIntoList" cdkDropList [cdkDropListConnectedTo]="[todoList]"
+    <div>
+      <h2>Drag & Drop</h2>
+     <p class="p1"> <strong> {{categories[0]}}, {{categories[1]}} or {{categories[2]}}?</strong></p>
+      <p>sort the items in the correct section of Venn Diagram below!</p>
+      <div (click)="onDestinationClick($event)" id="venn-diagram-container" #doneList="cdkDropList" [cdkDropListData]="dropIntoList" cdkDropList [cdkDropListConnectedTo]="[todoList]"
         (cdkDropListDropped)="drop2($event)"></div>
+
+    </div>
+      
   
     
     <div  cdkDropList #todoList="cdkDropList" [cdkDropListData]="items" [cdkDropListConnectedTo]="[doneList]"
       class="example-list" (cdkDropListDropped)="drop2($event)">
      
         <!-- Reset Button -->
-        <button (click)="resetGrid()">Reset</button>
+        <button *ngIf="!shuffledItems?.length" (click)="resetGrid()">Start</button>
         
         <!-- 3x3 Table -->
-        <table border="1">
+        <table border="1" *ngIf="shuffledItems?.length">
           <thead>
             <tr>
               <!-- Dynamically generate table headers based on categories -->
@@ -58,7 +64,7 @@
                 <!-- Calculate the index based on row and column -->
                 <ng-container *ngIf="shuffledItems[row * 3 + col] as item">
                   <ul>
-                    <li cdkDrag (cdkDragStarted)="onDragStartCdk($event, item)">
+                    <li (click)="onSourceClick($event, item)" cdkDrag (cdkDragStarted)="onDragStartCdk($event, item)">
                       <ng-container *ngIf="item.src.includes('images'); else textContent">
                         <img style="height: 50px; width: 50px;" [src]="item?.src" alt="Image" />
                         <label>{{ item?.name }}</label>
@@ -68,6 +74,7 @@
                   </ul>
                 </ng-container>
               </td>
+              <p *ngIf="!shuffledItems?.length"> All items have been dragged from here!</p>
             </tr>
           </tbody>
         </table>
