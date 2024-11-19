@@ -8,8 +8,4 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'venn-diagrams';
 
-  getCoordinates(event: MouseEvent) {
-    console.log('coordinates', event.clientX, event.clientY)
-   
-  }
 }

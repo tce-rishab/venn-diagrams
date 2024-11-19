@@ -3,12 +3,8 @@ import { AfterViewInit, Component, ElementRef, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import * as p5 from 'p5';
 import { ResetDialogComponent } from '../reset-dialog/reset-dialog.component';
-
-export interface VennDiagramI {
-  name: string, 
-  category: string, 
-  src: string
-}
+import { VennDiagramI } from '../venn.interface';
+import { VENNOBJECT } from '../data.json';
 @Component({
   selector: 'app-left-hand-container',
   templateUrl: './left-hand-container.component.html',
@@ -16,47 +12,20 @@ export interface VennDiagramI {
 })
 export class LeftHandContainerComponent implements OnInit, AfterViewInit {
   private p5: any;
-
+  vennObject = VENNOBJECT?.sports
   shuffledItems: any[] = [];
   resetItems: Array<VennDiagramI> = [];
   sourceClick: any;
   DestinationClick: any;
-  
-  // categories = ['A', 'B', 'C'];
- 
-  // items:Array <VennDiagramI> = [
-  //   { name: 'Item 1', category: 'A' },
-  //   { name: 'Item 2', category: 'B' },
-  //   { name: 'Item 3', category: 'C' },
-  //   { name: 'Item 4', category: 'A' },
-  //   { name: 'Item 5', category: 'B' },
-  //   { name: 'Item 6', category: 'C' },
-  // ];
-
-  categories = ['Herbivore', 'Carnivore', 'Omnivore'];
-  items:Array <VennDiagramI> = [
-    { name: 'Cow', category: 'Herbivore', src: '/assets/images/cow.svg' },
-    { name: 'Lion', category: 'Carnivore', src: '/assets/images/lion.svg' },
-    { name: 'Dog', category: 'Omnivore', src: '/assets/images/dog.svg' },
-    { name: 'Deer', category: 'Herbivore', src: '/assets/images/deer.svg' },
-    { name: 'Badger', category: 'Omnivore', src: '/assets/images/badger.svg' },
-    { name: 'Giraffe', category: 'Herbivore', src: '/assets/images/giraffe.svg' },
-    { name: 'Polar Bear', category: 'Carnivore', src: '/assets/images/polar-bear.svg' },
-    { name: 'dolphin', category: 'Carnivore', src: '/assets/images/dolphin.svg' },
-    { name: 'Rhinoceros', category: 'Herbivore', src: '/assets/images/rhinoceros.svg' },
-  ];
-
-  dropIntoList:Array <VennDiagramI> = [];
+  categories: Array<{ id: string, label: string }> = this.vennObject?.catagories;
+  items: Array<VennDiagramI> = this.vennObject?.items
+  id = this.vennObject?.id;
+  subtitle = this.vennObject?.subtitle;
+  sampleSpace = this.vennObject?.type;
+  dropIntoList: Array<VennDiagramI> = [];
+  draggedItem: any;
 
 
-
-  // items = [
-  //   { col1: 'Item 1 Text', col2: 'Item 1 Text', col3: 'Item 1 Text' },
-  //   { col1: 'Item 2 Text', col2: 'Item 2 Image', col3: 'Item 2 Text' },
-  //   { col1: 'Item 3 Text', col2: 'Item 3 Image', col3: 'Item 3 Text' }
-  // ];
-
-  
   shuffleArray(array: any[]) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -67,22 +36,22 @@ export class LeftHandContainerComponent implements OnInit, AfterViewInit {
 
   // Method to reset and shuffle the grid items
   resetGrid() {
-    if(this.items?.length)
-    this.shuffledItems = this.shuffleArray(this.items); // Shuffle a copy of the items array
-  else {
-    const listCopy = JSON.parse(JSON.stringify(this.resetItems));
-    this.shuffledItems = this.shuffleArray(listCopy);
-    this.items = listCopy
-  }
-   
+    if (this.items?.length)
+      this.shuffledItems = this.shuffleArray(this.items); // Shuffle a copy of the items array
+    else {
+      const listCopy = JSON.parse(JSON.stringify(this.resetItems));
+      this.shuffledItems = this.shuffleArray(listCopy);
+      this.items = listCopy
+    }
+
   }
 
-  drop2(event: CdkDragDrop<Array<VennDiagramI>>) {
+  drop(event: CdkDragDrop<Array<VennDiagramI>>) {
     if (this.validateDropPoint(event)) {
       if (event.previousContainer === event.container) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
       } else {
-            const index = this.items?.findIndex(item => item?.name === this.draggedItem?.name);
+        const index = this.items?.findIndex(item => item?.name === this.draggedItem?.name);
         transferArrayItem(
           event.previousContainer.data,
           event.container.data,
@@ -94,44 +63,39 @@ export class LeftHandContainerComponent implements OnInit, AfterViewInit {
       this.draggedItem = null; // Clear the dragged item
 
       // call pop up if all items are moved
-         if(!this.items?.length)
-           this.openDialog();
+      if (!this.items?.length)
+        this.openDialog();
     }
 
 
-    console.log('drop2', event, this.items, this.dropIntoList)
+    console.log('drop', event, this.items, this.dropIntoList)
   }
 
   openDialog() {
     const dialogRef = this.dialog.open(ResetDialogComponent);
 
     dialogRef.afterClosed().subscribe(result => {
-      if(result)
+      if (result)
         this.resetGrid()
 
     });
   }
-  // items = [
-  //   { col1: 'Item 1 Text', col2: 'Item 1 Text', col3: 'Item 1 Text' },
-  //   { col1: 'Item 2 Text', col2: 'Item 2 Image', col3: 'Item 2 Text' },
-  //   { col1: 'Item 3 Text', col2: 'Item 3 Image', col3: 'Item 3 Text' }
-  // ];
 
-  draggedItem: any;
+ 
 
-  constructor(private elementRef: ElementRef, public dialog: MatDialog) {}
+  constructor(private elementRef: ElementRef, public dialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.createCanvas();
+    // this.categories = CATEGORIES.slice();
     this.resetGrid();
     const listCopy = JSON.parse(JSON.stringify(this.items));
     this.resetItems = this.shuffleArray(listCopy);
     // this.resetItems = [...this.items];
-   
+
   }
 
   ngAfterViewInit(): void {
-     
+    this.createCanvas()
   }
 
   onDragStartCdk(event: CdkDragStart, item: any): void {
@@ -139,31 +103,33 @@ export class LeftHandContainerComponent implements OnInit, AfterViewInit {
     this.draggedItem = item;
     // event.dataTransfer?.setData('text', JSON.stringify(item));
   }
-  onSourceClick(e: any, i: any): void{
-    console.log(e,i)
+
+  onSourceClick(e: any, i: any): void {
+    console.log(e, i)
     this.sourceClick = i;
   }
-  onDestinationClick(e: any): void{
+
+  onDestinationClick(e: any): void {
     const index = this.items?.findIndex(item => item?.name === this.sourceClick?.name);
     let isTransferarble = true;
     console.log(e)
     // Get the p5 canvas position
-  const canvasElement = this.p5.canvas; // Assuming you have the p5 canvas stored as this.p5.canvas
+    const canvasElement = this.p5.canvas; // Assuming you have the p5 canvas stored as this.p5.canvas
     // e.clientX, e.clientY
     const canvasRect = canvasElement?.getBoundingClientRect(); // Get the bounding rectangle of the canvas
-   const  x = e.clientX - canvasRect.left;
+    const x = e.clientX - canvasRect.left;
     const y = e.clientY - canvasRect.top;
     if (this.sourceClick) {
-      
+
       const inCircleA = this.isInsideCircle(x, y, 150, 200, 100); // Circle A
       const inCircleB = this.isInsideCircle(x, y, 250, 200, 100); // Circle B
 
-      if (this.sourceClick.category === this.categories[0] && inCircleA && !inCircleB ) {
-        alert(`Item ${this.sourceClick.name} dropped in correct area ${ this.categories[0]}!`);
-      } else if (this.sourceClick.category === this.categories[1] && inCircleB && !inCircleA) {
-        alert(`Item ${this.sourceClick.name} dropped in correct area ${ this.categories[1]}!`);
-      } else if (this.sourceClick.category === this.categories[2] && inCircleA && inCircleB) {
-        alert(`Item ${this.sourceClick.name} dropped in correct intersection area ${ this.categories[2]}!`);
+      if (this.sourceClick.category === this.categories[0]?.id && inCircleA && !inCircleB) {
+        alert(`Item ${this.sourceClick.name} dropped in correct area ${this.categories[0]?.label}!`);
+      } else if (this.sourceClick.category === this.categories[1]?.id && inCircleB && !inCircleA) {
+        alert(`Item ${this.sourceClick.name} dropped in correct area ${this.categories[1]?.label}!`);
+      } else if (this.sourceClick.category === this.categories[2]?.id && inCircleA && inCircleB) {
+        alert(`Item ${this.sourceClick.name} dropped in correct intersection area ${this.categories[2]?.label}!`);
       } else {
         alert(`Item ${this.sourceClick.name} dropped in wrong area.`);
         // return false;
@@ -171,54 +137,52 @@ export class LeftHandContainerComponent implements OnInit, AfterViewInit {
         // this.sourceClick = null;
       }
     }
-    if(isTransferarble && index >= 0){
-      
-        transferArrayItem(
-          this.items,
-          this.dropIntoList,
-          index,               //calculate the index of dragged item.
-          0
-        );
-        console.log('click_transfer', this.items, this.dropIntoList)
-        this.sourceClick = null;
+    if (isTransferarble && index >= 0) {
+      transferArrayItem(
+        this.items,
+        this.dropIntoList,
+        index,               //calculate the index of dragged item.
+        0
+      );
+      console.log('click_transfer', this.items, this.dropIntoList)
+      this.sourceClick = null;
     }
 
-     // call pop up if all items are moved
-     if(!this.items?.length)
+    // call pop up if all items are moved
+    if (!this.items?.length)
       this.openDialog();
   }
 
   validateDropPoint(event: CdkDragDrop<Array<any>>): boolean {
-    console.log('Drop Event:', event,this.draggedItem);
+    console.log('Drop Event:', event, this.draggedItem);
 
     let { x, y } = event?.dropPoint; // p5.js mouse coordinates
     const item = this.draggedItem;
-// Get the p5 canvas position
-const canvasElement = this.p5.canvas; // Assuming you have the p5 canvas stored as this.p5.canvas
-     
-  const canvasRect = canvasElement?.getBoundingClientRect(); // Get the bounding rectangle of the canvas
+    // Get the p5 canvas position
+    const canvasElement = this.p5.canvas; // Assuming you have the p5 canvas stored as this.p5.canvas
+    const canvasRect = canvasElement?.getBoundingClientRect(); // Get the bounding rectangle of the canvas
 
-  // Adjust drop coordinates relative to the p5 canvas
-  x = x - canvasRect.left;
-  y = y - canvasRect.top;
+    // Adjust drop coordinates relative to the p5 canvas
+    x = x - canvasRect.left;
+    y = y - canvasRect.top;
 
     if (item) {
       const inCircleA = this.isInsideCircle(x, y, 150, 200, 100); // Circle A
       const inCircleB = this.isInsideCircle(x, y, 250, 200, 100); // Circle B
 
-      if (item.category === this.categories[0] && inCircleA && !inCircleB ) {
-        alert(`Item ${item.name} dropped in correct area ${ this.categories[0]}!`);
-      } else if (item.category === this.categories[1] && inCircleB && !inCircleA) {
-        alert(`Item ${item.name} dropped in correct area ${ this.categories[1]}!`);
-      } else if (item.category === this.categories[2] && inCircleA && inCircleB) {
-        alert(`Item ${item.name} dropped in correct intersection area ${ this.categories[2]}!`);
+      if (item.category === this.categories[0]?.id && inCircleA && !inCircleB) {
+        alert(`Item ${item.name} dropped in correct area ${this.categories[0]?.label}!`);
+      } else if (item.category === this.categories[1]?.id && inCircleB && !inCircleA) {
+        alert(`Item ${item.name} dropped in correct area ${this.categories[1]?.label}!`);
+      } else if (item.category === this.categories[2]?.id && inCircleA && inCircleB) {
+        alert(`Item ${item.name} dropped in correct intersection area ${this.categories[2]?.label}!`);
       } else {
         alert(`Item ${item.name} dropped in wrong area.`);
         return false;
       }
     }
 
-    
+
     return true;
   }
 
@@ -228,23 +192,18 @@ const canvasElement = this.p5.canvas; // Assuming you have the p5 canvas stored 
 
   sketch(p: any): void {
     let canvas: any;
-    
+
     p.setup = () => {
       canvas = p.createCanvas(400, 400);
       // Bind 'dragover' event to allow drop
       canvas.elt.addEventListener('dragover', (event: DragEvent) => {
         event.preventDefault(); // Necessary to allow dropping
       });
-
-      // Bind 'drop' event to handle dropping
-      // canvas.elt.addEventListener('drop', (event: DragEvent) => {
-      //   this.onDrop(event);
-      // });
     };
 
     p.draw = () => {
       p.background(255);
-      
+
       // Draw circles for sets A and B
       p.fill(255, 0, 0, 150);
       p.ellipse(150, 200, 200, 200); // A
@@ -255,51 +214,16 @@ const canvasElement = this.p5.canvas; // Assuming you have the p5 canvas stored 
       // Add labels
       p.fill(0);
       p.textSize(11);
-      p.text(this.categories[0], 110, 120);
-      p.text(this.categories[1], 240, 120);
-      p.text(this.categories[2], 175, 150);
+      p.text(this.categories[0]?.label, 110, 120);
+      p.text(this.categories[1]?.label, 240, 120);
+      p.text(this.categories[2]?.label, 175, 150);
     };
-  }
-
-  // Handle drop event
-  onDrop(event: DragEvent): void {
-    
-    event.preventDefault();
-    
-    const data = event.dataTransfer?.getData('text');
-    if (data) {
-      const item = JSON.parse(data);
-      console.log('dropped', item)
-      // Get the position where the item was dropped
-      const x = event.offsetX;
-      const y = event.offsetY;
-
-      // Check if the dropped position is in circle A or B
-      const inCircleA = this.isInsideCircle(x, y, 150, 200, 100); // Circle A
-      const inCircleB = this.isInsideCircle(x, y, 250, 200, 100); // Circle B
-     
-      if (item.category === this.categories[0] && inCircleA && !inCircleB ) {
-        alert(`Item ${item.name} dropped in correct area A!`);
-      } else if (item.category === this.categories[1] && inCircleB && !inCircleA) {
-        alert(`Item ${item.name} dropped in correct area B!`);
-      } else if (item.category === this.categories[2] && inCircleA && inCircleB) {
-        alert(`Item ${item.name} dropped in correct intersection area C!`);
-      } else {
-        alert(`Item ${item.name} dropped in wrong area.`);
-      }
-    }
   }
 
   // Helper function to check if a point is inside a circle
   isInsideCircle(x: number, y: number, cx: number, cy: number, r: number): boolean {
     const distance = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
     return distance <= r;
-  }
-
-  // Method to handle drag and drop
-  drop(event: CdkDragDrop<string[]>) {
-    console.log('drop', event)
-    moveItemInArray(this.items, event.previousIndex, event.currentIndex);
   }
 
   ngOnDestroy(): void {

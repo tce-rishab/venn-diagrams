@@ -1,47 +1,19 @@
 
-<!-- <div class="example-container">
-    <h2>To do</h2>
-  
-    <div
-      cdkDropList
-      #todoList="cdkDropList"
-      [cdkDropListData]="todo"
-      [cdkDropListConnectedTo]="[doneList]"
-      class="example-list"
-      (cdkDropListDropped)="drop2($event)">
-      <div class="example-box" *ngFor="let item of todo" cdkDrag>{{item}}</div>
-    </div>
-  </div>
-  
-  <div class="example-container">
-    <h2>Done</h2>
-  
-    <div
-      cdkDropList
-      
-      [cdkDropListData]="done"
-      [cdkDropListConnectedTo]="[todoList]"
-      class="example-list"
-      (cdkDropListDropped)="drop($event)">
-      <div class="example-box" *ngFor="let item of done" cdkDrag>{{item}}</div>
-    </div>
-  </div>
-   -->
   
   <div fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="10%" style="margin: right 10px ;">
     <div>
-      <h2>Drag & Drop</h2>
-     <p class="p1"> <strong> {{categories[0]}}, {{categories[1]}} or {{categories[2]}}?</strong></p>
-      <p>sort the items in the correct section of Venn Diagram below!</p>
+      <h2>{{vennObject?.title}}</h2>
+     <p class="p1"> <strong> {{categories[0]?.label}}, {{categories[1]?.label}} or {{categories[2]?.label}}?</strong></p>
+      <p>{{subtitle}}</p>
       <div (click)="onDestinationClick($event)" id="venn-diagram-container" #doneList="cdkDropList" [cdkDropListData]="dropIntoList" cdkDropList [cdkDropListConnectedTo]="[todoList]"
-        (cdkDropListDropped)="drop2($event)"></div>
+        (cdkDropListDropped)="drop($event)"></div>
 
     </div>
       
   
     
     <div  cdkDropList #todoList="cdkDropList" [cdkDropListData]="items" [cdkDropListConnectedTo]="[doneList]"
-      class="example-list" (cdkDropListDropped)="drop2($event)">
+      class="example-list" (cdkDropListDropped)="drop($event)">
      
         <!-- Reset Button -->
         <button *ngIf="!shuffledItems?.length" (click)="resetGrid()">Start</button>
@@ -52,7 +24,7 @@
             <tr>
               <!-- Dynamically generate table headers based on categories -->
               <th *ngFor="let category of categories; let i = index ">
-                {{ category }} <span *ngIf="i < 2 ">Or</span>
+                {{ category?.label }} <span *ngIf="i < 2 ">Or</span>
                  
               </th>
             </tr>
@@ -65,7 +37,7 @@
                 <ng-container *ngIf="shuffledItems[row * 3 + col] as item">
                   <ul>
                     <li (click)="onSourceClick($event, item)" cdkDrag (cdkDragStarted)="onDragStartCdk($event, item)">
-                      <ng-container *ngIf="item.src.includes('images'); else textContent">
+                      <ng-container *ngIf="item?.type === 'IMAGE'; else textContent">
                         <img style="height: 50px; width: 50px;" [src]="item?.src" alt="Image" />
                         <label>{{ item?.name }}</label>
                       </ng-container>
@@ -87,50 +59,4 @@
   </div>
 
 
-  
-<!-- <div>
-    <table>
-      <tr>
-        <th *ngFor="let category of categories">{{category}}</th>
-
-      </tr>
-      <tr *ngFor="let category of categories">
-        <ng-container *ngFor="let item of items">
-            <td  *ngIf="item?.category === category" draggable="true" (dragstart)="onDragStart($event, item)">{{ item.name }}</td>
-
-        </ng-container>
-        
-        
-      </tr>
-    </table> 
-  
-    <div id="venn-diagram-container"></div> 
-  
-  </div> -->
-  
-<!-- <div cdkDrag>drag me around</div>
-
- <div >
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Column 1</th>
-          <th>Column 2</th>
-          <th>Column 3</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of items">
-          <td draggable="true" (dragstart)="onDragStart($event, item)">{{ item.col1 }}</td>
-          <td  (dragstart)="onDragStart($event, item)">
-            <ng-container *ngIf="item.col2.includes('Image'); else textContent">
-              <img src="https://via.placeholder.com/50" alt="Image" />
-            </ng-container>
-            <ng-template #textContent>{{ item.col2 }}</ng-template>
-          </td>
-          <td draggable="true" (dragstart)="onDragStart($event, item)">{{ item.col3 }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div> -->
   
